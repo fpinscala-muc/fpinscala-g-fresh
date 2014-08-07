@@ -26,9 +26,9 @@ trait SharedTests {
 
   def depthFunction(depth: Tree[Any] => Int) {
     it should "return the maximum depth of the tree" in {
-      assert(depth(Leaf(1)) === 1)
-      assert(depth(Branch(Leaf(1), Leaf(1))) === 2)
-      assert(depth(Branch(Leaf(1), Branch(Branch(Leaf(2), Leaf(3)), Leaf(4)))) === 4)
+      assert(depth(Leaf(1)) === 0)
+      assert(depth(Branch(Leaf(1), Leaf(1))) === 1)
+      assert(depth(Branch(Leaf(1), Branch(Branch(Leaf(2), Leaf(3)), Leaf(4)))) === 3)
     }
   }
 

@@ -24,7 +24,7 @@ object Tree {
       case Branch(left, right) => traverse(left, acc + 1) max traverse(right, acc + 1)
       case Leaf(_) => acc
     }
-    traverse(tree, 1)
+    traverse(tree, 0)
   }
 
   def map[A,B](tree: Tree[A])(f: A => B): Tree[B] =
@@ -46,7 +46,7 @@ object Tree {
     fold(tree)(v => v)(_ max _)
 
   def depthViaFold(tree: Tree[Any]): Int =
-    fold(tree)(v => 1)((l, r) => 1 + (l max r))
+    fold(tree)(v => 0)((l, r) => 1 + (l max r))
 
   def mapViaFold[A,B](tree: Tree[A])(f: A => B): Tree[B] =
     fold(tree)(v => Leaf(f(v)): Tree[B])(Branch(_, _))
