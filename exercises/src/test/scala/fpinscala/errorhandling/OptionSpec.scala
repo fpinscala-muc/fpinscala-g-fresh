@@ -69,4 +69,64 @@ class OptionSpec extends FlatSpec {
   "filter(predicate), when applied to None," should "return None" in {
     assert((None filter (_ => true)) === None)
   }
+
+  import Option._
+
+  behavior of "variance"
+
+  it should "return the variance of the given sequence of numbers" in {
+    assert(variance(List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) === Some(8.25))
+  }
+
+  it should "return None if applied to an empty sequence" in {
+    assert(variance(List()) === None)
+  }
+
+  behavior of "map2"
+
+  it should "return None if any of the given arguments is None" in {
+    assert(map2(Some(1), None)(_ + _) === None)
+    assert(map2(None: Option[Int], Some(1))(_ + _) === None)
+    assert(map2(None: Option[Int], None)(_ + _) === None)
+  }
+
+  it should "return Some(f(a, b)) if both arguments are Some" in {
+    assert(map2(Some(1), Some(2))(_ + _) === Some(3))
+  }
+
+  behavior of "sequence"
+
+  it should "return None if the given list contains None" in {
+    assert(sequence(List(None)) === None)
+    assert(sequence(List(None, Some(1))) === None)
+    assert(sequence(List(Some(1), None)) === None)
+    assert(sequence(List(Some(1), Some(2), None)) === None)
+  }
+
+  it should "return Some containing a list of all option values" in {
+    assert(sequence(List()) === Some(List()))
+    assert(sequence(List(Some(1))) === Some(List(1)))
+    assert(sequence(List(Some(1), Some(2))) === Some(List(1, 2)))
+  }
+
+  behavior of "traverse"
+
+  def evenInts(int: Int): Option[Int] = if (even(int)) Some(int) else None
+
+  it should "apply the given function to the elements of the given list" in {
+    assert(traverse(List(2, 4))(evenInts) === Some(List(2, 4)))
+  }
+
+  it should "return None if any of the Options produced by the given function is None" in {
+    assert(traverse(List(1))(evenInts) === None)
+    assert(traverse(List(2, 4, 6, 7, 8))(evenInts) === None)
+  }
+
+  it should "return Some list of all the Option values produced by the given function" in {
+    assert(traverse(List(2, 4, 6, 8))(evenInts) === Some(List(2, 4, 6, 8)))
+  }
+
+  it should "return Some(Nil) if the given list is empty" in {
+    assert(traverse(Nil: List[Int])(evenInts) === Some(Nil))
+  }
 }

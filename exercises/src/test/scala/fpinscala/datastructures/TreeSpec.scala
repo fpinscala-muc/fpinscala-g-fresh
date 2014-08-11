@@ -32,6 +32,7 @@ trait SharedTests {
     }
   }
 
+  // Polymorphic function arguments are (currently) no supported :-(
 //  def mapFunction[A,B](map: Tree[A] => (A => B) => Tree[B]) {
 //    it should "apply the function to all elements of the tree" in {
 //      def double(value: Int): Int = 2 * value
