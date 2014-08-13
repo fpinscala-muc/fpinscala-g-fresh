@@ -7,7 +7,7 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class OptionSpec extends FlatSpec {
 
-  behavior of "map"
+  // Chapter 4, exercise 1
 
   def toString(obj: Any): String = obj.toString
 
@@ -29,8 +29,6 @@ class OptionSpec extends FlatSpec {
     assert((None getOrElse 1) === 1)
   }
 
-  behavior of "flatMap"
-
   def f(int: Int): Option[String] = if (even(int)) Some(int.toString) else None
 
   "flatMap(f), when applied to Some(value)," should "return f(value)" in {
@@ -42,8 +40,6 @@ class OptionSpec extends FlatSpec {
     assert((None flatMap f) === None)
   }
 
-  behavior of "orElse"
-
   "orElse(alternative), when applied to Some(value)," should "return this option" in {
     assert((Some(0) orElse Some(1)) === Some(0))
     assert((Some(0) orElse None) === Some(0))
@@ -53,8 +49,6 @@ class OptionSpec extends FlatSpec {
     assert((None orElse Some(1)) === Some(1))
     assert((None orElse None) === None)
   }
-
-  behavior of "filter"
 
   def even(int: Int): Boolean = int % 2 == 0
 
@@ -70,6 +64,8 @@ class OptionSpec extends FlatSpec {
     assert((None filter (_ => true)) === None)
   }
 
+  // Chapter 4, exercise 2
+
   import Option._
 
   behavior of "variance"
@@ -82,6 +78,8 @@ class OptionSpec extends FlatSpec {
     assert(variance(List()) === None)
   }
 
+  // Chapter 4, exercise 3
+
   behavior of "map2"
 
   it should "return None if any of the given arguments is None" in {
@@ -93,6 +91,8 @@ class OptionSpec extends FlatSpec {
   it should "return Some(f(a, b)) if both arguments are Some" in {
     assert(map2(Some(1), Some(2))(_ + _) === Some(3))
   }
+
+  // Chapter 4, exercise 4
 
   behavior of "sequence"
 
@@ -108,6 +108,8 @@ class OptionSpec extends FlatSpec {
     assert(sequence(List(Some(1))) === Some(List(1)))
     assert(sequence(List(Some(1), Some(2))) === Some(List(1, 2)))
   }
+
+  // Chapter 4, exercise 5
 
   behavior of "traverse"
 
