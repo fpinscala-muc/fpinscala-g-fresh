@@ -23,17 +23,17 @@ class EitherSpec extends FlatSpec with Matchers {
     left map incrementByOne should be theSameInstanceAs left
   }
 
-  case object ParseError extends RuntimeException
+  case class ParseError(input: String) extends RuntimeException
 
   def parseInt(string: String): Either[Exception, Int] =
     try Right(Integer.valueOf(string))
     catch {
-      case e: Exception => Left(ParseError)
+      case e: Exception => Left(new ParseError(string))
     }
 
   "flatMap(f), when applied to Right(value)," should "return f(value)" in {
     Right("42") flatMap parseInt should equal (Right(42))
-    Right("fourty-two") flatMap parseInt should equal (Left(ParseError))
+    Right("fourty-two") flatMap parseInt should equal (Left(ParseError("fourty-two")))
   }
 
   "flatMap(f), when applied to Left," should "return this" in {
@@ -69,5 +69,38 @@ class EitherSpec extends FlatSpec with Matchers {
   "map2(other)(f), when applied to Left with a Left argument," should "return this" in {
     val left = Left(new Exception)
     left.map2(Left(new Exception))(sum) should be theSameInstanceAs left
+  }
+
+  // Chapter 4, exercise 7
+  import Either._
+
+  "sequence(list), when applied to a list of Right values," should "combine values into a single Right" in {
+    sequence(List(Right(1), Right(2), Right(3))) should equal (Right(List(1, 2, 3)))
+  }
+
+  "sequence(list), when applied to an empty list," should "return Right containing an empty list" in {
+    sequence(Nil) should equal (Right(Nil))
+  }
+
+  "sequence(list), when applied to a list containing Left," should "return the first Left value" in {
+    val left = Left(new Exception)
+    sequence(List(left)) should be theSameInstanceAs left
+    sequence(List(Right(42), left)) should be theSameInstanceAs left
+    sequence(List(left, Right(42))) should be theSameInstanceAs left
+    sequence(List(left, Right(42), Left(new Exception))) should be theSameInstanceAs left
+  }
+
+  "traverse(list)(f), applied to a list of valid values," should "combine values produced by f into a single Right" in {
+    traverse(List("1", "2", "3"))(parseInt) should equal (Right(List(1, 2, 3)))
+  }
+
+  "traverse(list)(f), applied to an empty list," should "return Right containing an empty list" in {
+    traverse(Nil)(parseInt) should equal (Right(Nil))
+  }
+
+  "traverse(list)(f), applied to a list with invalid values," should "return the first Left value produced by f" in {
+    traverse(List("a"))(parseInt) should equal (Left(ParseError("a")))
+    traverse(List("1", "b", "3"))(parseInt) should equal (Left(ParseError("b")))
+    traverse(List("a", "b", "3"))(parseInt) should equal (Left(ParseError("a")))
   }
 }

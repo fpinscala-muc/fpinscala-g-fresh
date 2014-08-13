@@ -52,4 +52,12 @@ object Either {
     try Right(a)
     catch { case e: Exception => Left(e) }
 
+  def sequence[E, A](es: List[Either[E, A]]): Either[E, List[A]] =
+    traverse(es)(a => a)
+
+  def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] =
+    as match {
+      case head :: tail => f(head) flatMap (b => traverse(tail)(f) map (b :: _))
+      case Nil => Right(Nil)
+    }
 }
