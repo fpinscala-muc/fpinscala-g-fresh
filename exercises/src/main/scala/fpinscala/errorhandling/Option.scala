@@ -124,8 +124,14 @@ object Option {
     if (xs.isEmpty) None
     else Some(xs.sum / xs.length)
 
+//  def variance(xs: Seq[Double]): Option[Double] =
+//    mean(xs) flatMap (m => mean(xs map (x => pow(x - m, 2))))
+
   def variance(xs: Seq[Double]): Option[Double] =
-    mean(xs) flatMap (m => mean(xs map (x => pow(x - m, 2))))
+    for {
+      m <- mean(xs)
+      v <- mean(xs map (x => pow(x - m, 2)))
+    } yield v
 
   def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
     a flatMap(av => b.map(bv => f(av, bv)))
