@@ -1,3 +1,4 @@
+
 package fpinscala.gettingstarted
 
 import scala.math.Ordering.Implicits._

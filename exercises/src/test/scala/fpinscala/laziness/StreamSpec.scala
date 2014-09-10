@@ -1,3 +1,4 @@
+
 package fpinscala.laziness
 
 import org.scalatest.Matchers
@@ -81,7 +82,7 @@ class StreamSpec extends FlatSpec with Matchers {
 
   behavior of "forAll, applied to an empty stream,"
 
-  it should "true" in {
+  it should "return true" in {
     Stream.empty[Int].forAll(even) should equal (true)
   }
 

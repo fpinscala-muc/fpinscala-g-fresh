@@ -35,6 +35,8 @@ trait Stream[+A] {
       case _ => empty
     }
 
+  def takeViaUnfold(n: Int): Stream[A] = sys.error("todo")
+
   def drop(n: Int): Stream[A] =
     this match {
       case Cons(h, t) if (n > 0) => t().drop(n - 1)
@@ -46,8 +48,6 @@ trait Stream[+A] {
 
   def forAll(p: A => Boolean): Boolean =
     foldRight(true)((a, b) => p(a) && b)
-
-  def startsWith[A](s: Stream[A]): Boolean = ???
 
   def headOption(): Option[A] =
     foldRight(Option.empty[A])((a, _) => Option(a))
@@ -63,6 +63,16 @@ trait Stream[+A] {
 
   def flatMap[B](f: A => Stream[B]): Stream[B] =
     foldRight(empty[B])((a, b) => f(a) append b)
+
+  def takeWhileViaUnfold(p: A => Boolean): Stream[A] = sys.error("todo")
+
+  def takeWhileViaFoldRight(p: A => Boolean): Stream[A] = sys.error("todo")
+
+  def mapViaUnfold[B](f: A => B): Stream[B] = sys.error("todo")
+
+  def zipWith[B,C](s2: Stream[B])(f: (A,B) => C): Stream[C] = sys.error("todo")
+
+  def startsWith[B](s: Stream[B]): Boolean = sys.error("todo")
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
@@ -82,7 +92,19 @@ object Stream {
 
   val ones: Stream[Int] = Stream.cons(1, ones)
 
-  def from(n: Int): Stream[Int] = ???
+  def constant[A](a: A): Stream[A] = sys.error("todo")
 
-  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = ???
+  def from(n: Int): Stream[Int] = sys.error("todo")
+
+  val fibs: Stream[Int] = sys.error("todo")
+
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = sys.error("todo")
+
+  val fibsViaUnfold: Stream[Int] = sys.error("todo")
+
+  def fromViaUnfold(n: Int): Stream[Int] = sys.error("todo")
+
+  def constantViaUnfold[A](a: A): Stream[A] = sys.error("todo")
+
+  val onesViaUnfold: Stream[Int] = sys.error("todo")
 }
