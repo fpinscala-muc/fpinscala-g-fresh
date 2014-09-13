@@ -5,11 +5,12 @@ import org.scalatest.Matchers
 import org.scalatest.FlatSpec
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import fpinscala.laziness.Stream._
 
 @RunWith(classOf[JUnitRunner])
 class StreamSpec extends FlatSpec with Matchers {
 
-  // Chapter 5, exercise 1
+  // Exercise 5.1
 
   "toList, applied to a non-empty stream," should "return a list containing the stream's elements" in {
     Stream(1).toList should equal (List(1))
@@ -20,7 +21,7 @@ class StreamSpec extends FlatSpec with Matchers {
     Stream().toList should equal (List())
   }
 
-  // Chapter 5, exercise 2
+  // Exercise 5.2
 
   "take(n), applied to a non-empty stream," should "return a stream containing the first n elements" in {
     Stream(1, 2, 3).take(0).toList should equal (List())
@@ -47,7 +48,7 @@ class StreamSpec extends FlatSpec with Matchers {
     Stream.empty.drop(1).toList should equal (List())
   }
 
-  // Chapter 5, exercise 3
+  // Exercise 5.3
 
   def even(int: Int): Boolean = int % 2 == 0
 
@@ -65,7 +66,7 @@ class StreamSpec extends FlatSpec with Matchers {
     Stream().takeWhile(even).toList should equal (List())
   }
 
-  // Chapter 5, exercise 4
+  // Exercise 5.4
 
   behavior of "forAll, applied to a non-empty stream,"
 
@@ -86,10 +87,10 @@ class StreamSpec extends FlatSpec with Matchers {
     Stream.empty[Int].forAll(even) should equal (true)
   }
 
-  // Chapter 5, exercise 5
+  // Exercise 5.5
 
 
-  // Chapter 5, exercise 6
+  // Exercise 5.6
 
   "headOption, applied to a non-empty stream," should "return Some of the first element" in {
     Stream(1, 2, 3).headOption should equal(Some(1))
@@ -99,7 +100,7 @@ class StreamSpec extends FlatSpec with Matchers {
     Stream().headOption should equal(None)
   }
 
-  // Chapter 5, exercise 7
+  // Exercise 5.7
 
   "map, applied to a non-empty stream," should "return apply the given function to the stream elements" in {
 	Stream(1, 2, 3).map(_ * 2).toList should equal(List(2, 4, 6))
@@ -126,11 +127,88 @@ class StreamSpec extends FlatSpec with Matchers {
 
   def double[A](a: A): Stream[A] = Stream(a, a)
 
-  "flatMap, applied to a non-empty stream," should "return a flat list containing the results of the map operation" in {
+  "flatMap, applied to a non-empty stream," should "return a flat stream containing the results of the map operation" in {
     Stream(1, 2, 3).flatMap(double).toList should equal(List(1, 1, 2, 2, 3, 3))
   }
 
   "flatMap, applied to an empty stream," should "return an empty stream" in {
     Stream().flatMap(double).toList should equal(List())
+  }
+
+  // Exercise 5.8
+
+  "constant(value)" should "return an infinite stream of the given value" in {
+	Stream.constant(0).take(0).toList should equal(List())
+	Stream.constant(1).take(3).toList should equal(List(1, 1, 1))
+	Stream.constant("*").take(5).toList should equal(List("*", "*", "*", "*", "*"))
+  }
+
+  // Exercise 5.9
+
+  "from(n)" should "return a stream of Ints starting from n" in {
+    Stream.from(0).take(3).toList should equal(List(0, 1, 2))
+    Stream.from(3).take(6).toList should equal(List(3, 4, 5, 6, 7, 8))
+  }
+
+  // Exercise 5.10
+
+  "fibs" should "return a stream of fibonacci numbers" in {
+	fibs.take(6).toList should equal(List(0, 1, 1, 2, 3, 5))
+  }
+
+  // Exercise 5.11, 5.12  TODO: figure out how to re-use the same set of tests for both take and takeViaUnold
+
+  "takeViaUnfold(n), applied to a non-empty stream," should "return a stream containing the first n elements" in {
+    Stream(1, 2, 3).takeViaUnfold(0).toList should equal (List())
+    Stream(1, 2, 3).takeViaUnfold(1).toList should equal (List(1))
+    Stream(1, 2, 3).takeViaUnfold(2).toList should equal (List(1, 2))
+    Stream(1, 2, 3).takeViaUnfold(3).toList should equal (List(1, 2, 3))
+  }
+
+  "takeViaUnfold(n), applied to a stream with less than n elements," should "return the full stream" in {
+    Stream(1).takeViaUnfold(3).toList should equal (List(1))
+  }
+
+  "takeViaUnfold, applied to an empty stream," should "return an empty stream" in {
+    Stream.empty.takeViaUnfold(3).toList should equal (List())
+  }
+
+  behavior of "zipAll"
+
+  it should "combine this and the given stream to a stream of pairs of options" in {
+    (Stream(1, 2) zipAll Stream("a", "b")).toList should equal (List((Some(1), Some("a")), (Some(2), Some("b"))))
+  }
+
+  it should "generate None when one of the streams is exhausted" in {
+	(Stream(1, 2) zipAll Stream(3)).toList should equal (List((Some(1), Some(3)), (Some(2), None)))
+    (Stream(1) zipAll Stream(2, 3)).toList should equal (List((Some(1), Some(2)), (None, Some(3))))
+	(Stream(1, 2) zipAll Empty).toList should equal (List((Some(1), None), (Some(2), None)))
+    (Empty zipAll Stream(1, 2)).toList should equal (List((None, Some(1)), (None, Some(2))))
+  }
+
+  it should "return an empty stream if both streams are empty" in {
+    (Empty zipAll Empty).toList should equal (List())
+  }
+
+  // Exercise 5.15
+
+  def toList[A](s: Stream[Stream[A]]) = s.map(_.toList).toList
+
+  "tails, applied to a non-empty stream," should "return a stream of all suffixes of the given stream" in {
+	toList(Stream(1, 2, 3).tails) should equal(List(List(1, 2, 3), List(2, 3), List(3), List()))
+  }
+
+  "tails, applied to an empty stream," should "return a stream containing only an empty stream" in {
+    toList(Stream().tails) should equal(List(List()))
+  }
+
+  // Exercise 5.16
+
+  "scanRight, applied to a non-empty stream," should "return a stream of the right folds of all suffixes" in {
+    Stream(1, 2, 3).scanRight(0)(_ + _).toList should equal(List(6, 5, 3, 0))
+  }
+
+  "scanRight, applied to an empty stream," should "return a stream with only the given zero value" in {
+    Stream[Int]().scanRight(0)(_ + _).toList should equal(List(0))
   }
 }
